@@ -13,8 +13,8 @@ The destination can be a register or a memory location. The source can be a regi
 
 In order to simulate this, we read in a binary file with a list of instructions. Each instruction consists of 2 bytes i.e:
 
-**0001011 11001011**
-and decode the bytes to produce an 8086 assembly instruction:
+**0001011 11001011** <br/>
+and decode the bytes to produce an 8086 assembly instruction: <br/>
 **mov cx, bx**
 
 <h2> To run the program: </h2>
@@ -26,15 +26,15 @@ dotnet run [binary file]
 
 2 binary files are provided:
 
-**listing_0037_single_register_mov**
-**listing_0038_many_register_mov**
+**listing_0037_single_register_mov** <br/>
+**listing_0038_many_register_mov** <br/>
 
 When running the program with one of the provided files, mov assembly instructions will be printed to the console.
 
 There are two files with an example of what the correct output for the decoded binary files should be:
 
-**listing_0037_single_register_mov.asm**
-**listing_0038_many_register_mov.asm**
+**listing_0037_single_register_mov.asm** <br/>
+**listing_0038_many_register_mov.asm** <br/>
 
 
 
