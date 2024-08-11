@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "dIx20itPBK7PvfFRroyBGNgtRj8GyothFQzzqDFuXzLB8LVR5YqdSw2gfNy404S0tfwif8eNjzZhhgqkE/qbVg==",
+  "dgSpecHash": "AMXLyfxV9qMenDZroPAufk7FHaH78P77I5zYFk2eI+uqxAVM3KsGEnB5xzqRKkRQwVPrMEJaBcdTLQOneO32Lg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\samkelog\\PerformanceAwareProg\\Decoder\\Decoder.csproj",
+  "projectFilePath": "C:\\Users\\samkelog\\PerformanceAwareProg\\PerformanceAwareProgramming\\Decoder.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\samkelog\\PerformanceAwareProg\\Decoder\\Decoder.csproj",
+      "projectUniqueName": "C:\\Users\\samkelog\\PerformanceAwareProg\\PerformanceAwareProgramming\\Decoder.csproj",
       "projectName": "Decoder",
-      "projectPath": "C:\\Users\\samkelog\\PerformanceAwareProg\\Decoder\\Decoder.csproj",
+      "projectPath": "C:\\Users\\samkelog\\PerformanceAwareProg\\PerformanceAwareProgramming\\Decoder.csproj",
       "packagesPath": "C:\\Users\\samkelog\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\samkelog\\PerformanceAwareProg\\Decoder\\obj\\",
+      "outputPath": "C:\\Users\\samkelog\\PerformanceAwareProg\\PerformanceAwareProgramming\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\samkelog\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -1,6 +1,4 @@
 ﻿
-// See https://aka.ms/new-console-template for more information
-
 namespace Program
 {
     public class Program
@@ -30,8 +28,15 @@ namespace Program
                 {0b110,"si"},
                 {0b111,"di"}
             };
+            
 
-            using var file = File.Open(".\\listing_0038_many_register_mov", FileMode.Open);
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Please enter a file");
+                Environment.Exit(0);       
+            }
+
+            using var file = File.Open(args[0], FileMode.Open);
             using var reader = new BinaryReader(file);
             Byte[] bytes = new byte[2];
 
@@ -40,7 +45,6 @@ namespace Program
                 var source = string.Empty;
                 var destination = string.Empty;
                 var register = lowRegisters;
-                Func<int,string> n = number => Convert.ToString(number, 2);
 
                 (int opcode, int d_bit, int w_bit, int mod, int reg_field, int rm_field) 
                     = ReadBytes(bytes[0], bytes[1]);
@@ -48,9 +52,7 @@ namespace Program
                 if (opcode == mov)
                 {
                     if (w_bit == 1)
-                    {
                         register = highRegisters;
-                    }
 
                     if (d_bit == 1)
                     {
@@ -62,7 +64,13 @@ namespace Program
                         register.TryGetValue(rm_field, out destination);
                     }
                 }
-                
+
+                if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(destination))
+                {
+                    Console.WriteLine("Invalid Decoding. Ensure you ented a correct file");
+                    Environment.Exit(0);
+                } 
+
                 Console.WriteLine($"mov {destination}, {source}");
             }
         }
@@ -76,8 +84,11 @@ namespace Program
             var reg_field = (secondByte >> 3) & 0b_111;
             var rm_field = secondByte & 0b_111;
 
+            if (op_code != 34){
+                Console.WriteLine("Incorrect file format or instruction");
+                Environment.Exit(0);
+            }
             return (op_code, d_bit, w_bit, mod, reg_field, rm_field);
         } 
     }
 }
-
