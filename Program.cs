@@ -29,7 +29,6 @@ namespace Program
                 {0b111,"di"}
             };
             
-
             if (args.Length == 0)
             {
                 Console.WriteLine("Please enter a file");
@@ -59,7 +58,8 @@ namespace Program
                         register.TryGetValue(reg_field, out destination);
                         register.TryGetValue(rm_field, out source);
                     }
-                    else{
+                    else
+                    {
                         register.TryGetValue(reg_field, out source);
                         register.TryGetValue(rm_field, out destination);
                     }
@@ -67,7 +67,7 @@ namespace Program
 
                 if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(destination))
                 {
-                    Console.WriteLine("Invalid Decoding. Ensure you ented a correct file");
+                    Console.WriteLine("Invalid Decoding. Ensure you entered a correct file");
                     Environment.Exit(0);
                 } 
 
