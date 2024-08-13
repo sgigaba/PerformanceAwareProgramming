@@ -5,7 +5,8 @@ namespace Program
     {
         static void Main(string[] args)
         {
-            var mov = 0b100010;
+            var mov_register_to_register = 0b100010;
+            var immediate_to_register = 0b1011;
             var lowRegisters = new Dictionary<int,string>()
             {
                 {0b000,"al"},
@@ -37,22 +38,34 @@ namespace Program
 
             using var file = File.Open(args[0], FileMode.Open);
             using var reader = new BinaryReader(file);
-            Byte[] bytes = new byte[2];
+            Byte[] bytes = new byte[1];
 
-            while (reader.Read(bytes) != 0)
+            while(reader.Read(bytes) != 0)
             {
-                var source = string.Empty;
-                var destination = string.Empty;
+                int w_bit;
+                int d_bit;
+                int reg;
+                int data;
+                int data16;
                 var register = lowRegisters;
+                string source;
+                string destination;
+                int reg_field;
+                int rm_field;
 
-                (int opcode, int d_bit, int w_bit, int mod, int reg_field, int rm_field) 
-                    = ReadBytes(bytes[0], bytes[1]);
-                
-                if (opcode == mov)
+                if (bytes[0] >> 2 == mov_register_to_register)
                 {
+                    d_bit = (bytes[0] >> 1) & 1;
+                    w_bit = bytes[0] & 1;   
+
+                    reader.Read(bytes);
+
+                    reg_field = (bytes[0] >> 3) & 7;
+                    rm_field = bytes[0] & 7;
+
                     if (w_bit == 1)
                         register = highRegisters;
-
+                        
                     if (d_bit == 1)
                     {
                         register.TryGetValue(reg_field, out destination);
@@ -63,32 +76,28 @@ namespace Program
                         register.TryGetValue(reg_field, out source);
                         register.TryGetValue(rm_field, out destination);
                     }
+                    Console.WriteLine($"mov {destination}, {source}");
                 }
 
-                if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(destination))
+                if (bytes[0] >> 4 == immediate_to_register)
                 {
-                    Console.WriteLine("Invalid Decoding. Ensure you entered a correct file");
-                    Environment.Exit(0);
-                } 
+                    w_bit = bytes[0] >> 3 & 1;
+                    reg = bytes[0] & 7;
 
-                Console.WriteLine($"mov {destination}, {source}");
+                    reader.Read(bytes);
+                    data = bytes[0];
+                    
+                    if (w_bit == 1)
+                    {
+                        register = highRegisters;
+                        reader.Read(bytes);
+                        data16 = bytes[0];
+                    }
+
+                    register.TryGetValue(reg, out source);
+                    Console.WriteLine($"mov {source}, {data}");
+                }
             }
         }
-
-        static (int opcode, int d_bit, int w_bit, int mod, int reg_field, int rm_field) ReadBytes(byte firstByte, byte secondByte)
-        {
-            var op_code = firstByte >> 2;
-            var d_bit = (firstByte >> 1) & 1;
-            var w_bit = firstByte & 1;
-            var mod = secondByte >> 6;
-            var reg_field = (secondByte >> 3) & 0b_111;
-            var rm_field = secondByte & 0b_111;
-
-            if (op_code != 34){
-                Console.WriteLine("Incorrect file format or instruction");
-                Environment.Exit(0);
-            }
-            return (op_code, d_bit, w_bit, mod, reg_field, rm_field);
-        } 
     }
 }
