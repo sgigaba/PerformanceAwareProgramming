@@ -7,6 +7,8 @@ namespace Program
         {
             var mov_register_to_register = 0b100010;
             var immediate_to_register = 0b1011;
+            var immediate_to_register_memory = 0b1100011;
+
             var lowRegisters = new Dictionary<int,string>()
             {
                 {0b000,"al"},
@@ -42,62 +44,104 @@ namespace Program
 
             while(reader.Read(bytes) != 0)
             {
+
                 int w_bit;
                 int d_bit;
                 int reg;
                 int data;
-                int data16;
                 var register = lowRegisters;
                 string source;
                 string destination;
                 int reg_field;
                 int rm_field;
+                int mod;
+
+                var registers = new List<Dictionary<int, string>>{
+                   lowRegisters,
+                   highRegisters  
+                };
 
                 if (bytes[0] >> 2 == mov_register_to_register)
                 {
-                    d_bit = (bytes[0] >> 1) & 1;
-                    w_bit = bytes[0] & 1;   
+                    MoveRegisterToRegister(bytes, reader, registers);
+                }
 
-                    reader.Read(bytes);
+                if (bytes[0] >> 1 == immediate_to_register_memory)
+                {
+                    
 
-                    reg_field = (bytes[0] >> 3) & 7;
-                    rm_field = bytes[0] & 7;
-
-                    if (w_bit == 1)
-                        register = highRegisters;
-                        
-                    if (d_bit == 1)
-                    {
-                        register.TryGetValue(reg_field, out destination);
-                        register.TryGetValue(rm_field, out source);
-                    }
-                    else
-                    {
-                        register.TryGetValue(reg_field, out source);
-                        register.TryGetValue(rm_field, out destination);
-                    }
-                    Console.WriteLine($"mov {destination}, {source}");
                 }
 
                 if (bytes[0] >> 4 == immediate_to_register)
                 {
-                    w_bit = bytes[0] >> 3 & 1;
-                    reg = bytes[0] & 7;
-
-                    reader.Read(bytes);
-                    data = bytes[0];
-                    
-                    if (w_bit == 1)
-                    {
-                        register = highRegisters;
-                        reader.Read(bytes);
-                        data16 = bytes[0];
-                    }
-
-                    register.TryGetValue(reg, out source);
-                    Console.WriteLine($"mov {source}, {data}");
+                    MoveImmediateToRegister(bytes, reader, registers);
                 }
             }
+        }
+
+        public static void MoveImmediateToRegister(Byte[] inputBytes, BinaryReader reader, List<Dictionary<int,string>> registers)
+        {
+            var w_bit = inputBytes[0] >> 3 & 1;
+            var reg = inputBytes[0] & 7;
+            int data;
+            var register = registers[1];
+            string source;
+
+            if (w_bit == 1)
+            {
+                Byte[] twelve_bits = new Byte[2];
+                
+                reader.Read(twelve_bits);
+
+                if (BitConverter.IsLittleEndian){
+                    Array.Reverse(twelve_bits);
+                    data = 256 * twelve_bits[0] + twelve_bits[1];
+                }
+                else{
+                    data = 256 * twelve_bits[1] + twelve_bits[0];
+                }
+            }
+            else{
+                Console.WriteLine("8 bit");
+                reader.Read(inputBytes);
+                data = inputBytes[0];
+            }
+
+            register.TryGetValue(reg, out source);
+            Console.WriteLine($"mov {source}, {data}");
+        }
+
+        public static void MoveRegisterToRegister(Byte[] inputBytes, BinaryReader reader, List<Dictionary<int,string>> registers)
+        {
+            var d_bit = (inputBytes[0] >> 1) & 1;
+            var w_bit = inputBytes[0] & 1;   
+
+            reader.Read(inputBytes);
+
+            var reg_field = (inputBytes[0] >> 3) & 7;
+            var rm_field = inputBytes[0] & 7;
+
+            var register = registers[0];
+            
+            if (w_bit == 1)
+                register = registers[1];
+
+            var destination = String.Empty;
+            var source = String.Empty;
+
+            if (d_bit == 1)
+            {
+                register.TryGetValue(reg_field, out destination);
+                register.TryGetValue(rm_field, out source);
+            }
+            else
+            {
+                register.TryGetValue(reg_field, out source);
+                register.TryGetValue(rm_field, out destination);
+            }
+
+            Console.WriteLine("; Register-to-register");
+            Console.WriteLine($"mov {destination}, {source}");
         }
     }
 }
