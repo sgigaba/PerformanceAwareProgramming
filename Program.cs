@@ -44,18 +44,6 @@ namespace Program
 
             while(reader.Read(bytes) != 0)
             {
-
-                int w_bit;
-                int d_bit;
-                int reg;
-                int data;
-                var register = lowRegisters;
-                string source;
-                string destination;
-                int reg_field;
-                int rm_field;
-                int mod;
-
                 var registers = new List<Dictionary<int, string>>{
                    lowRegisters,
                    highRegisters  
@@ -68,7 +56,7 @@ namespace Program
 
                 if (bytes[0] >> 1 == immediate_to_register_memory)
                 {
-                    
+                   // Still need to cater for this 
 
                 }
 
