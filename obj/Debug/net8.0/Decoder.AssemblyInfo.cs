@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Decoder")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6a61f1c347764787d94b2fe31d55fc1174c30f32")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6101c4a1c8093ec3c68c3493fddf24ac9db9d594")]
 [assembly: System.Reflection.AssemblyProductAttribute("Decoder")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Decoder")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

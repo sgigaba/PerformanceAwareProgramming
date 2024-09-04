@@ -41,8 +41,6 @@ namespace Program
             }
         }
 
-
-
         public static void MoveImmediateToRegister(Byte[] inputBytes, BinaryReader reader, List<Dictionary<int,string>> registers)
         {
             var w_bit = inputBytes[0] >> 3 & 1;
