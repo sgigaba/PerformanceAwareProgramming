@@ -1,42 +1,21 @@
-﻿
+﻿using PerformanceAwareProgramming;
+
 namespace Program
 {
     public class Program
     {
         static void Main(string[] args)
         {
-            var mov_register_to_register = 0b100010;
-            var immediate_to_register = 0b1011;
-            var immediate_to_register_memory = 0b1100011;
-
-            var lowRegisters = new Dictionary<int,string>()
-            {
-                {0b000,"al"},
-                {0b001,"cl"},
-                {0b010,"dl"},
-                {0b011,"bl"},
-                {0b100,"ah"},
-                {0b101,"ch"},
-                {0b110,"dh"},
-                {0b111,"bh"},
-            };
-
-            var highRegisters = new Dictionary<int, string>(){
-                {0b000,"ax"},
-                {0b001,"cx"},
-                {0b010,"dx"},
-                {0b011,"bx"},
-                {0b100,"sp"},
-                {0b101,"bp"},
-                {0b110,"si"},
-                {0b111,"di"}
-            };
-            
             if (args.Length == 0)
             {
                 Console.WriteLine("Please enter a file");
                 Environment.Exit(0);       
             }
+
+            var mov_register_to_register = 0b100010;
+            var immediate_to_register = 0b1011;
+            var immediate_to_register_memory = 0b1100011;
+            var registers = new Registers().GetAddresses();
 
             using var file = File.Open(args[0], FileMode.Open);
             using var reader = new BinaryReader(file);
@@ -44,11 +23,6 @@ namespace Program
 
             while(reader.Read(bytes) != 0)
             {
-                var registers = new List<Dictionary<int, string>>{
-                   lowRegisters,
-                   highRegisters  
-                };
-
                 if (bytes[0] >> 2 == mov_register_to_register)
                 {
                     MoveRegisterToRegister(bytes, reader, registers);
@@ -67,6 +41,8 @@ namespace Program
             }
         }
 
+
+
         public static void MoveImmediateToRegister(Byte[] inputBytes, BinaryReader reader, List<Dictionary<int,string>> registers)
         {
             var w_bit = inputBytes[0] >> 3 & 1;
@@ -74,6 +50,7 @@ namespace Program
             int data;
             var register = registers[1];
             string source;
+            var mod = inputBytes[0] >> 7 & 3;
 
             if (w_bit == 1)
             {
@@ -90,7 +67,7 @@ namespace Program
                 }
             }
             else{
-                Console.WriteLine("8 bit");
+                register = registers[0];
                 reader.Read(inputBytes);
                 data = inputBytes[0];
             }
@@ -99,7 +76,7 @@ namespace Program
             Console.WriteLine($"mov {source}, {data}");
         }
 
-        public static void MoveRegisterToRegister(Byte[] inputBytes, BinaryReader reader, List<Dictionary<int,string>> registers)
+        static void MoveRegisterToRegister(Byte[] inputBytes, BinaryReader reader, List<Dictionary<int,string>> registers)
         {
             var d_bit = (inputBytes[0] >> 1) & 1;
             var w_bit = inputBytes[0] & 1;   
@@ -108,15 +85,40 @@ namespace Program
 
             var reg_field = (inputBytes[0] >> 3) & 7;
             var rm_field = inputBytes[0] & 7;
-
+            var mod = inputBytes[0] >> 6;
             var register = registers[0];
+            string destination = "";
+            string source = "";
             
             if (w_bit == 1)
                 register = registers[1];
 
-            var destination = String.Empty;
-            var source = String.Empty;
+            switch(mod)
+            {
+                case 3:
+                    Console.WriteLine("; Register-to-register");
+                    (destination, source) = RegisterModeSourceAndDest(d_bit, reg_field, rm_field, register);
+                    break;
+                case 0:
+                    Console.WriteLine("; Source address calculation");
+                    register.TryGetValue(reg_field, out destination);
+                    registers[2].TryGetValue(rm_field, out source);
+                    break;
+                case 1:
+                    Console.WriteLine("; Source address calculation plus 8-bit displacement");
+                break;
+                case 2:
+                    Console.WriteLine("; Source address calculation plus 16-bit displacement");
+                break;
+            }
 
+            Console.WriteLine($"mov {destination}, {source}");
+        }
+
+        static (string destination, string source) RegisterModeSourceAndDest(int d_bit, int reg_field, int rm_field, Dictionary<int, string> register)
+        {
+            string destination;
+            string source;
             if (d_bit == 1)
             {
                 register.TryGetValue(reg_field, out destination);
@@ -128,8 +130,7 @@ namespace Program
                 register.TryGetValue(rm_field, out destination);
             }
 
-            Console.WriteLine("; Register-to-register");
-            Console.WriteLine($"mov {destination}, {source}");
+            return (destination, source);
         }
     }
 }
